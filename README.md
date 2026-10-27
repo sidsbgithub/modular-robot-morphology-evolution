@@ -1,179 +1,155 @@
-![ariel-header](./docs/resources/ariel_logo.svg)
+# Modular Robot Morphology Evolution via Tree Genomes
 
-# ARIEL: Autonomous Robots through Integrated Evolution and Learning
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Framework](https://img.shields.io/badge/ARIEL-Framework-blue.svg)](https://ci-group.github.io/ariel/)
+[![Course](https://img.shields.io/badge/VU%20Amsterdam-Evolutionary%20Computing%202026-008080.svg)](https://cs.vu.nl/ci/)
+[![License](https://img.shields.io/badge/License-GPL--3.0-green.svg)](./LICENSE)
 
-[![Python](https://img.shields.io/badge/python-%E2%89%A53.12-blue.svg)](https://www.python.org/)
-[![MuJoCo](https://img.shields.io/badge/MuJoCo-%E2%89%A53.3.6-orange.svg)](https://mujoco.org/)
-[![License](https://img.shields.io/badge/license-GPL--3.0-green.svg)](./LICENSE)
-[![Docs](https://img.shields.io/badge/docs-ci--group.github.io%2Fariel-informational.svg)](https://ci-group.github.io/ariel/)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Status](https://img.shields.io/badge/status-beta-orange)](https://github.com/AndrzejSzczepura/EvolutionaryComputing2026)
+> **Evolutionary Computing · Robot Morphology Evolution**  
+> **Authors:** Siddhant Singh Bisht & Collaborators  
+> **Affiliation:** Department of Computer Science, Vrije Universiteit Amsterdam  
+> **Findings Report:** [`report/morphology_evolution_findings.md`](report/morphology_evolution_findings.md)
 
-ARIEL is a research framework, developed by the [Computational Intelligence Group](https://cs.vu.nl/ci/) at the Vrije Universiteit Amsterdam, for the joint evolution and learning of modular robots in simulation.
+---
 
-This is the ARIEL fork for the Evolutionary Computing course, 2026 edition. Course assignment
-materials will be added into `/assignments` as the course progresses.
+## 🤖 Executive Summary
 
-## Overview
+This repository contains the complete experimental code, statistical analysis engine, and dataset for evolving **modular robot body phenotypes** using the [ARIEL](https://ci-group.github.io/ariel/) framework.
 
-**ARIEL** is a research framework for the evolution and learning of modular robots. It couples an evolutionary computation (EC) engine with a [MuJoCo](https://mujoco.org/)-based simulation stack, allowing robot *bodies* (morphologies) and *brains* (controllers) to be co-evolved and optimised within a single, consistent pipeline.
+Using an expressive **Tree-Genome representation** (`ariel.ec.genotypes.tree.TreeGenome`), robot morphologies (composed of core modules, structural bricks, and active hinges) are evolved to match a target set of 5 diverse robotic morphologies (ranging from 7 to 25 modules). The objective is to minimise the **weighted Zhang–Shasha Tree Edit Distance (TED)** aggregated across all target bodies ($\text{Fitness} = \mu_{\text{TED}} + \sigma_{\text{TED}}$).
 
-The framework is organised around a few core ideas:
+Through an extensive four-stage experimental funnel spanning **>4,800 EA runs**—including a 420-configuration full-factorial screen with racing selection—we systematically analyze how **mutation operators** (`subtree`, `replace`, `mixed`, `shrink`, `hoist`) interact with **crossover rates** and **selection pressure** to govern structural bloat and morphological convergence.
 
-- **Genotypes**: encodings that generate robot bodies and/or brains (tree genomes, CPPN/NEAT, and a Neural Developmental Encoding "NDE").
-- **Phenotypes**: the RoboGen-lite modular body construction system that turns a genotype into a buildable robot made of cores, bricks and hinges.
-- **Controllers**: neural and central-pattern-generator (CPG) controllers that drive the robot's joints.
-- **Simulation**: terrains/environments, tasks (locomotion, gait learning, turning) and a MuJoCo worker that evaluates an individual and reports its
-  fitness.
-- **EC engine**: reusable building blocks (populations, individuals, selection/crossover, archive) for assembling evolutionary algorithms.
-- **Visualisation**: dashboards and analysis tools for inspecting results.
-
-## Features
-
-- 🧠 **Body–brain co-optimisation**: 
-  - evolve / learn a controller for a fixed body
-  - evolve bodies and brains simultaneously
-  - evolve robot bodies and brains simultaneously augmented with lifetime learning.
-- 🤖 **Modular bodies**: Robot construction from cores, bricks and hinges, plus a library of prebuilt robots (gecko, spider, …).
-- 🧬 **Multiple genotypes**: tree genomes, CPPN/NEAT, and a Neural Developmental Encoding (NDE).
-- 🌍 **MuJoCo simulation**: ready-made terrains (flat, rugged, crater, tilted, Olympic arena) and tasks (targeted locomotion, gait learning,
-  turning in place).
-- 🔁 **Reusable EC engine**: composable populations, individuals, operators, and an archive, decoupled from the simulation layer.
-- 💾 **Built-in logging**: runs are persisted to a SQLite database for later analysis and replay.
-- 📊 **Visualisation**: dashboards and plotting utilities for results.
-
-## Documentation
-[ARIEL main documentation page](https://ci-group.github.io/ariel/)
-
-## Quickstart
-
-After [installing](#installation-and-running), build a prebuilt robot, drop it into a world, and launch the MuJoCo viewer:
-
-```python
-import mujoco
-from mujoco import viewer
-
-from ariel.simulation.environments import SimpleFlatWorld
-from ariel.body_phenotypes.robogen_lite.prebuilt_robots.gecko import gecko
-
-# 1. Create a world (a flat terrain)
-world = SimpleFlatWorld()
-
-# 2. Build a modular robot body and spawn it into the world
-robot = gecko()                       # returns a CoreModule
-world.spawn(robot.spec, position=[0, 0, 0.1])
-
-# 3. Compile to a MuJoCo model + data
-model = world.spec.compile()
-data = mujoco.MjData(model)
-
-# 4. Watch it in the interactive viewer
-viewer.launch(model, data)
+```mermaid
+graph LR
+    subgraph Funnel [ Four-Stage Experimental Funnel ]
+        S1[Stage 1: Coarse OFAT Screen<br/>156 runs · 3 seeds] --> S2[Stage 2: Refined Screen<br/>290 runs · 5 seeds]
+        S2 --> S3[Stage 3: 420-Config Factorial Racing<br/>4,352 runs · Top 20 Refined]
+        S3 --> S4[Stage 4: Held-Out Final Benchmark<br/>50 runs · 10 fresh seeds]
+    end
 ```
 
-From here, see [`examples/`](examples/) for adding controllers, defining fitness, and running full evolutionary loops.
+---
 
-## Requirements
+## 🔬 Research Findings & Scientific Insights
 
-- **Python** ≥ 3.12
-- **MuJoCo** ≥ 3.3.6
-- **[uv](https://docs.astral.sh/uv/)** for environment and dependency management
+| Aspect | Key Finding |
+|---|---|
+| **Constructive vs. Destructive Mutation** | **Constructive operators dominate.** Operators that inject novel genetic material (`mixed`: $12.39 \pm 0.35$, `subtree`: $12.49 \pm 0.36$, `replace`: $12.53 \pm 0.46$) significantly outperform purely reductive operators (`shrink`: $12.81 \pm 0.46$, `hoist`: $12.99 \pm 0.29$; subtree vs. hoist $p = 0.007$, Cliff's $\delta = -0.72$). Destructive operators drive the population into premature structural atrophy ($\approx 9\text{--}12$ modules), failing to match larger targets ($13\text{--}15$ modules). |
+| **Mutation $\times$ Crossover Interaction** | **Crossover rescues weak mutation.** Crossover is indispensable for relabeling and removal operators (yielding $1.3\text{--}1.9$ fitness gains), but provides only modest additive benefits ($0.25\text{--}0.40$) when constructive subtree mutation is already injecting structural variation. |
+| **Evolution vs. Random Search Baseline** | **EA obliterates random search.** Every single EA variant decisively beat the matched-budget random search ($17.02 \pm 0.21$, $p < 0.001$, Cliff's $\|\delta\| = 1.0$). In fact, the EA surpasses random search's *final* budget value after just **1 generation** ($120$ evaluations). |
 
-All Python dependencies are declared in [`pyproject.toml`](pyproject.toml) and are installed automatically by `uv sync`.
+---
 
-## Installation and Running
+## 📊 Experimental Results & Figures
 
-This project uses [uv](https://docs.astral.sh/uv/).
+### 1. Factorial Parameter Interaction Heatmap (420 Configurations)
+Comprehensive screen illustrating the interaction between mutation operator, mutation probability, and crossover rate across 8 seeds.
 
-To run the code examples, please do:
-1. Clone the repository
-```bash
-git clone https://github.com/AndrzejSzczepura/EvolutionaryComputing2026.git
-cd EvolutionaryComputing2026
+![Figure S1: Factorial Heatmap](figures/figS1_factorial_heatmap.png)
+
+### 2. Convergence Trajectories Across Held-Out Seeds
+Fitness convergence curves over 100 generations ($6{,}060$ evaluations per run, 10 held-out seeds per variant).
+
+![Figure 1: Convergence Trajectories](figures/fig1_convergence.png)
+
+### 3. Morphological Tree Size Dynamics
+Mean module count per individual over generations compared against target body sizes ($7, 11, 15, 19, 25$). Notice how constructive operators preserve healthy structural diversity.
+
+![Figure 2: Tree Size Dynamics](figures/fig2_tree_size.png)
+
+### 4. Final Best Fitness Distribution
+Boxplot with individual run jitter points comparing all five mutation operators against the matched random search baseline.
+
+![Figure 3: Final Fitness Distribution](figures/fig3_final_boxplot.png)
+
+---
+
+## 📁 Repository Structure
+
 ```
-2. Create a uv virtual environment inside the repository folder
-```bash
-  uv venv
+.
+├── experiments/
+│   ├── morphology_evolution.py       # Main experiment runner (screening, factorial racing, final benchmark)
+│   ├── analyze_results.py            # Statistical suite (Mann-Whitney U, Cliff's delta, plotting)
+│   ├── baseline_random_search.py     # Matched-budget random search baseline
+│   ├── tree_edit_distance.py         # Zhang-Shasha weighted tree edit distance metric
+│   └── target_bodies/                # Target modular morphology blueprints (JSON)
+├── data/                             # Full experimental dataset & statistical tables
+│   ├── factorial_summary_all_420_configs.csv
+│   ├── factorial_final_ranking.csv
+│   ├── factorial_marginal_effects.csv
+│   ├── factorial_interaction_operator_x_crossover.csv
+│   ├── final_stats.csv
+│   ├── pairwise_tests.csv
+│   └── raw_results.csv
+├── figures/                          # Publication-ready figures (PNG)
+│   ├── fig1_convergence.png
+│   ├── fig2_tree_size.png
+│   ├── fig3_final_boxplot.png
+│   ├── figS1_factorial_heatmap.png
+│   └── figS2_factorial_finalists_boxplot.png
+├── report/                           # Detailed findings report
+│   └── morphology_evolution_findings.md
+├── src/ariel/                        # ARIEL framework source
+├── pyproject.toml                    # Python project configuration
+├── uv.lock                           # Locked dependency resolution
+└── README.md                         # This file
 ```
-3. Sync the virtual environment with the requirements
+
+---
+
+## 🚀 How to Reproduce
+
+### Prerequisites
+
+- Python 3.12+
+- `uv` (recommended) or standard `pip`
+
+### 1. Environment Setup
+
 ```bash
+# Clone the repository
+git clone https://github.com/<your-username>/modular-robot-morphology-evolution.git
+cd modular-robot-morphology-evolution
+
+# Install dependencies into virtual environment
 uv sync
 ```
-4. Run an example, in this case, brain evolution (aka learning) using:
+
+### 2. Run Experiments
+
+#### Run the Final Held-Out Benchmark (5 Operators $\times$ 10 Seeds + Random Search + Analysis):
 ```bash
-uv run examples/re_book/1_brain_evolution.py
+uv run python experiments/morphology_evolution.py --final --workers 10
 ```
 
-## Repository Structure
+#### Run a Single Experiment:
+```bash
+# Subtree mutation (seed 42)
+uv run python experiments/morphology_evolution.py --seed 42 --mutation subtree
 
-```
-ariel/
-├── src/ariel/                      # Main package
-│   ├── body_phenotypes/            # Genotype → robot body construction
-│   │   ├── robogen_lite/           # RoboGen-lite modular body system
-│   │   │   ├── modules/            #   Body parts: core, brick, hinge
-│   │   │   ├── decoders/           #   Genotype-to-body decoders (hi-prob, CPPN, vector)
-│   │   │   ├── cppn_neat/          #   CPPN/NEAT genome implementation
-│   │   │   ├── prebuilt_robots/    #   Ready-made bodies (gecko, spider, ...)
-│   │   │   ├── constructor.py      #   Assembles modules into a MuJoCo spec
-│   │   │   └── config.py
-│   │   └── lynx_mjspec/            # Lynx robot arm body + evolve/replay pipeline
-│   ├── ec/                         # Evolutionary computation engine
-│   │   ├── genotypes/              #   Encodings: tree, cppn, nde (neural dev. encoding)
-│   │   ├── population.py           #   Population container
-│   │   ├── individual.py           #   Individual (genotype + fitness + state)
-│   │   ├── archive.py              #   Archive of historical individuals
-│   │   ├── crossover.py            #   Variation operators
-│   │   ├── generators.py           #   Genotype generators + mutators
-│   │   └── ea.py                   #   EA orchestration
-│   ├── simulation/                 # MuJoCo simulation stack
-│   │   ├── environments/           #   Terrains/worlds (flat, rugged, crater, arena, ...)
-│   │   ├── tasks/                  #   Tasks (targeted locomotion, gait, turning)
-│   │   ├── controllers/            #   Controllers (CPG variants, neural)
-│   │   └── mujoco_worker.py        #   Evaluates an individual, returns fitness
-│   ├── parameters/                 # Shared types, module defs, MuJoCo params
-│   ├── utils/                      # Renderers, trackers, video, optimizers, descriptors
-│   └── visualisation/              # Dashboards and analysis tooling
-├── examples/                       # Runnable examples
-│   ├── a_mujoco/                   #   MuJoCo basics (launcher, rendering, cameras)
-│   ├── b_robots/                   #   Building robots from graphs/decoders
-│   ├── c_genotypes/                #   Body/brain evolution with genotypes
-│   ├── re_book/                    #   "Robot Evolution" book walkthrough examples
-│   └── z_ec_course/                #   EC course assignment templates
-├── tests/                          # Unit and functional tests
-├── docs/                           # Sphinx documentation sources
-├── pyproject.toml                  # Project metadata and dependencies (uv)
-└── noxfile.py                      # Automation sessions (tests, docs, compiled build)
+# Hoist mutation (seed 42)
+uv run python experiments/morphology_evolution.py --seed 42 --mutation hoist
 ```
 
-Simulation runs write output to a local `__data__/` directory (created on first run).
-
-## Examples
-
-The [`examples/`](examples/) folder is the best entry point for learning the framework. A good reading order is:
-
-1. [`examples/a_mujoco/`](examples/a_mujoco/): MuJoCo fundamentals: launching a simulation, rendering frames, recording video, and cameras.
-2. [`examples/b_robots/`](examples/b_robots/): turning genotypes/graphs into robot bodies and placing them on terrains.
-3. [`examples/re_book/`](examples/re_book/): end-to-end brain evolution, then body-brain evolution, learning, and waypoint-following tasks.
-4. [`examples/c_genotypes/`](examples/c_genotypes/): body/brain joint evolution, multiprocessing, and replaying results from a database.
-
-## Citation
-
-Papers about ARIEL have been accepted for publication at **ALIFE 2026** and **PPSN 2026**. Citation entries for those papers will be added here once they are published.
-
-In the meantime, if you use ARIEL in your research, please cite the repository:
-
-```bibtex
-@unpublished{ariel,
-    author = {Di Matteo, Jacopo Michele and Grigoriadis, Ioannis and Aron Richard Ferencz and Lilly Schwarzenbach and Agoston Eiben},
-    title  = {ARIEL: Autonomous Robots through Integrated Evolution and Learning},
-    year   = {2026},
-    note   = {https://github.com/ci-group/ariel}
-}
+#### Run the Factorial Screen:
+```bash
+uv run python experiments/morphology_evolution.py --screen --screen-axis factorial --workers 8
 ```
 
-<!-- TODO: replace with the official ALIFE 2026 and PPSN 2026 citations once published. -->
+### 3. Generate Analysis & Statistical Tables
 
-## License
+To reproduce the final statistics (`final_stats.csv`, `pairwise_tests.csv`) and figures from existing run logs:
 
-Distributed under the terms of the [GPL-3.0 license](LICENSE). ARIEL is free and open source software.
+```bash
+uv run python experiments/analyze_results.py
+```
+
+---
+
+## 👥 Authors & Acknowledgments
+
+- **Siddhant Singh Bisht** & Project Collaborators
+- Department of Computer Science, **Vrije Universiteit Amsterdam**
+- Built on the ARIEL research framework developed by the Computational Intelligence Group.

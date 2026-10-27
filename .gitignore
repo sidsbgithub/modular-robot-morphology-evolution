@@ -13,6 +13,14 @@ docs/apidocs/
 docs/autoapi
 # 3D Models
 *.stl
+# Typings and IDE caches
+.typings/
+.pytest_cache/
+.ruff_cache/
+# Databases & SQLite
+*.db
+*.sqlite
+*.sqlite3
 ### PYTHON ######################################################################
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -223,6 +231,8 @@ Temporary Items
 *.webp
 # Portable Network Graphics
 *.png
+!figures/*.png
+!report/**/*.png
 # Animated Portable Network Graphics
 *.apng
 # Multiple-image Network Graphics
@@ -234,8 +244,11 @@ Temporary Items
 *.svg
 *.svgz
 !ariel_header.svg
+!docs/resources/*.svg
 # Portable Document Format
 *.pdf
+!figures/*.pdf
+!report/**/*.pdf
 # X BitMap
 *.xbm
 # BMP
