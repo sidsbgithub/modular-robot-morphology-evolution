@@ -22,10 +22,10 @@ Through an extensive four-stage experimental funnel spanning **>4,800 EA runs**�
 
 ```mermaid
 graph LR
-    subgraph Funnel [ Four-Stage Experimental Funnel ]
-        S1[Stage 1: Coarse OFAT Screen<br/>156 runs · 3 seeds] --> S2[Stage 2: Refined Screen<br/>290 runs · 5 seeds]
-        S2 --> S3[Stage 3: 420-Config Factorial Racing<br/>4,352 runs · Top 20 Refined]
-        S3 --> S4[Stage 4: Held-Out Final Benchmark<br/>50 runs · 10 fresh seeds]
+    subgraph Funnel ["Four-Stage Experimental Funnel"]
+        S1["Stage 1: Coarse OFAT Screen<br/>156 runs · 3 seeds"] --> S2["Stage 2: Refined Screen<br/>290 runs · 5 seeds"]
+        S2 --> S3["Stage 3: 420-Config Factorial Racing<br/>4,352 runs · Top 20 Refined"]
+        S3 --> S4["Stage 4: Held-Out Final Benchmark<br/>50 runs · 10 fresh seeds"]
     end
 ```
 
