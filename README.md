@@ -16,7 +16,7 @@
 
 This repository contains the complete experimental code, statistical analysis engine, and dataset for evolving **modular robot body phenotypes** using the [ARIEL](https://ci-group.github.io/ariel/) framework.
 
-Using an expressive **Tree-Genome representation** (`ariel.ec.genotypes.tree.TreeGenome`), robot morphologies (composed of core modules, structural bricks, and active hinges) are evolved to match a target set of 5 diverse robotic morphologies (ranging from 7 to 25 modules). The objective is to minimise the **weighted Zhang–Shasha Tree Edit Distance (TED)** aggregated across all target bodies ($\text{Fitness} = \mu_{\text{TED}} + \sigma_{\text{TED}}$).
+Using an expressive **Tree-Genome representation** (`ariel.ec.genotypes.tree.TreeGenome`), robot morphologies (composed of core modules, structural bricks, and active hinges) are evolved to match a target set of 5 diverse robotic morphologies (ranging from 7 to 25 modules). The objective is to minimise the **weighted Zhang–Shasha Tree Edit Distance (TED)** aggregated across all target bodies (Fitness = μ_TED + σ_TED).
 
 Through an extensive four-stage experimental funnel spanning **>4,800 EA runs**—including a 420-configuration full-factorial screen with racing selection—we systematically analyze how **mutation operators** (`subtree`, `replace`, `mixed`, `shrink`, `hoist`) interact with **crossover rates** and **selection pressure** to govern structural bloat and morphological convergence.
 
@@ -35,9 +35,9 @@ graph LR
 
 | Aspect | Key Finding |
 |---|---|
-| **Constructive vs. Destructive Mutation** | **Constructive operators dominate.** Operators that inject novel genetic material (`mixed`: $12.39 \pm 0.35$, `subtree`: $12.49 \pm 0.36$, `replace`: $12.53 \pm 0.46$) significantly outperform purely reductive operators (`shrink`: $12.81 \pm 0.46$, `hoist`: $12.99 \pm 0.29$; subtree vs. hoist $p = 0.007$, Cliff's $\delta = -0.72$). Destructive operators drive the population into premature structural atrophy ($\approx 9\text{--}12$ modules), failing to match larger targets ($13\text{--}15$ modules). |
-| **Mutation $\times$ Crossover Interaction** | **Crossover rescues weak mutation.** Crossover is indispensable for relabeling and removal operators (yielding $1.3\text{--}1.9$ fitness gains), but provides only modest additive benefits ($0.25\text{--}0.40$) when constructive subtree mutation is already injecting structural variation. |
-| **Evolution vs. Random Search Baseline** | **EA obliterates random search.** Every single EA variant decisively beat the matched-budget random search ($17.02 \pm 0.21$, $p < 0.001$, Cliff's $\|\delta\| = 1.0$). In fact, the EA surpasses random search's *final* budget value after just **1 generation** ($120$ evaluations). |
+| **Constructive vs. Destructive Mutation** | **Constructive operators dominate.** Operators that inject novel genetic material (`mixed`: 12.39 ± 0.35, `subtree`: 12.49 ± 0.36, `replace`: 12.53 ± 0.46) significantly outperform purely reductive operators (`shrink`: 12.81 ± 0.46, `hoist`: 12.99 ± 0.29; subtree vs. hoist p = 0.007, Cliff's δ = -0.72). Destructive operators drive the population into premature structural atrophy (≈ 9–12 modules), failing to match larger targets (13–15 modules). |
+| **Mutation × Crossover Interaction** | **Crossover rescues weak mutation.** Crossover is indispensable for relabeling and removal operators (yielding 1.3–1.9 fitness gains), but provides only modest additive benefits (0.25–0.40) when constructive subtree mutation is already injecting structural variation. |
+| **Evolution vs. Random Search Baseline** | **EA obliterates random search.** Every single EA variant decisively beat the matched-budget random search (17.02 ± 0.21, p < 0.001, Cliff's \|δ\| = 1.0). In fact, the EA surpasses random search's *final* budget value after just **1 generation** (120 evaluations). |
 
 ---
 
@@ -49,7 +49,7 @@ Comprehensive screen illustrating the interaction between mutation operator, mut
 ![Figure S1: Factorial Heatmap](figures/figS1_factorial_heatmap.png)
 
 ### 2. Convergence Trajectories Across Held-Out Seeds
-Fitness convergence curves over 100 generations ($6{,}060$ evaluations per run, 10 held-out seeds per variant).
+Fitness convergence curves over 100 generations (6,060 evaluations per run, 10 held-out seeds per variant).
 
 ![Figure 1: Convergence Trajectories](figures/fig1_convergence.png)
 
